@@ -1,15 +1,12 @@
 #include "ledstrip.h"
 #include "toilet.h"
 
-extern bool somebody_inside_toilet;
+extern Toilet toilet;
 
 LedStrip::LedStrip()
 {
     FastLED.addLeds<LED_TYPE, LEDS_PIN, COLOR_ORDER>(strip_leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
     FastLED.setBrightness(BRIGHTNESS);
-    
-    currentPalette = RainbowColors_p;
-    currentBlending = LINEARBLEND;
     
     ChangePaletteRandom();
 }
@@ -36,10 +33,10 @@ void LedStrip::SetupBlackAndWhiteStripedPalette()
     // 'black out' all 16 palette entries...
     fill_solid(currentPalette, 16, CRGB::Black);
     // and set every fourth one to white.
-    currentPalette[0] = CRGB::White;
-    currentPalette[4] = CRGB::White;
-    currentPalette[8] = CRGB::White;
-    currentPalette[12] = CRGB::White; 
+    strip_leds[0] = CRGB::White;
+    strip_leds[4] = CRGB::White;
+    strip_leds[8] = CRGB::White;
+    strip_leds[12] = CRGB::White; 
 }
 
 // This function sets up a palette of purple and green stripes.
@@ -85,29 +82,27 @@ const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM =
 
 void LedStrip::ChangePaletteRandom()
 {
-uint8_t secondHand = random(11);
+uint8_t random_palette = random(11);
     
-        if( secondHand == 0)  { currentPalette = myRedWhiteBluePalette_p; currentBlending = LINEARBLEND;  }
-        if( secondHand == 1)  { currentPalette = RainbowColors_p;         currentBlending = LINEARBLEND; }
-        if( secondHand == 2)  { currentPalette = RainbowStripeColors_p;   currentBlending = NOBLEND;  }
-        if( secondHand == 3)  { currentPalette = RainbowStripeColors_p;   currentBlending = LINEARBLEND; }
-        if( secondHand == 4)  { SetupPurpleAndGreenPalette();             currentBlending = LINEARBLEND; }
-        if( secondHand == 5)  { SetupTotallyRandomPalette();              currentBlending = LINEARBLEND; }
-        if( secondHand == 6)  { SetupBlackAndWhiteStripedPalette();       currentBlending = NOBLEND; }
-        if( secondHand == 7)  { SetupBlackAndWhiteStripedPalette();       currentBlending = LINEARBLEND; }
-        if( secondHand == 8)  { currentPalette = CloudColors_p;           currentBlending = LINEARBLEND; }
-        if( secondHand == 9)  { currentPalette = PartyColors_p;           currentBlending = LINEARBLEND; }
-        if( secondHand == 10)  { currentPalette = myRedWhiteBluePalette_p; currentBlending = NOBLEND;  }
-        if( secondHand == 11)  { currentPalette = myRedWhiteBluePalette_p; currentBlending = LINEARBLEND; }
+        if( random_palette == 0)  { currentPalette = myRedWhiteBluePalette_p; currentBlending = LINEARBLEND;  }
+        if( random_palette == 1)  { currentPalette = RainbowColors_p;         currentBlending = LINEARBLEND; }
+        if( random_palette == 2)  { currentPalette = RainbowStripeColors_p;   currentBlending = NOBLEND;  }
+        if( random_palette == 3)  { currentPalette = RainbowStripeColors_p;   currentBlending = LINEARBLEND; }
+        if( random_palette == 4)  { SetupPurpleAndGreenPalette();             currentBlending = LINEARBLEND; }
+        if( random_palette == 5)  { SetupTotallyRandomPalette();              currentBlending = LINEARBLEND; }
+        if( random_palette == 6)  { SetupBlackAndWhiteStripedPalette();       currentBlending = NOBLEND; }
+        if( random_palette == 7)  { SetupBlackAndWhiteStripedPalette();       currentBlending = LINEARBLEND; }
+        if( random_palette == 8)  { currentPalette = CloudColors_p;           currentBlending = LINEARBLEND; }
+        if( random_palette == 9)  { currentPalette = PartyColors_p;           currentBlending = LINEARBLEND; }
+        if( random_palette == 10)  { currentPalette = myRedWhiteBluePalette_p; currentBlending = NOBLEND;  }
+        if( random_palette == 11)  { currentPalette = myRedWhiteBluePalette_p; currentBlending = LINEARBLEND; }
 }
 
 void LedStrip::ChangePaletteOneByOne()
 {
         static uint8_t secondHand = 0;
-        secondHand++;
-        if (secondHand == 12) {secondHand = 0;}
-        if (secondHand == 0) {currentPalette = myRedWhiteBluePalette_p; currentBlending = LINEARBLEND;}
-        if (secondHand == 1) {currentPalette = RainbowColors_p;         currentBlending = LINEARBLEND;}
+        if (secondHand == 0) {currentPalette = RainbowColors_p;         currentBlending = LINEARBLEND;}
+        if (secondHand == 1) {currentPalette = myRedWhiteBluePalette_p; currentBlending = LINEARBLEND;}
         if (secondHand == 2) {currentPalette = RainbowStripeColors_p;   currentBlending = NOBLEND;}
         if (secondHand == 3) {currentPalette = RainbowStripeColors_p;   currentBlending = LINEARBLEND;}
         if (secondHand == 4) {SetupPurpleAndGreenPalette();             currentBlending = LINEARBLEND;}
@@ -117,8 +112,17 @@ void LedStrip::ChangePaletteOneByOne()
         if (secondHand == 8) {currentPalette = CloudColors_p;           currentBlending = LINEARBLEND;}
         if (secondHand == 9) {currentPalette = PartyColors_p;           currentBlending = LINEARBLEND;}
         if (secondHand == 10) {currentPalette = myRedWhiteBluePalette_p; currentBlending = NOBLEND;}
-        if (secondHand == 11) {currentPalette = myRedWhiteBluePalette_p; currentBlending = LINEARBLEND;}
-        if (secondHand == 12) {fill_solid(currentPalette, NUM_LEDS, CRGB::Black);}
+        if (secondHand == 11) {currentPalette = LavaColors_p; currentBlending = LINEARBLEND;}
+        if (secondHand == 12) {currentPalette = OceanColors_p; currentBlending = LINEARBLEND;}
+        if (secondHand == 13) {currentPalette = ForestColors_p; currentBlending = LINEARBLEND;}
+        if (secondHand == 14) {currentPalette = HeatColors_p; currentBlending = LINEARBLEND;}
+        if (secondHand == 15) {currentPalette = LavaColors_p; currentBlending = NOBLEND;}
+        if (secondHand == 16) {currentPalette = ForestColors_p; currentBlending = NOBLEND;}
+        if (secondHand == 17) {currentPalette = Black_p; currentBlending = LINEARBLEND;}
+        Serial.print(F("Set palette number "));
+        Serial.println(secondHand);
+        secondHand++;
+        if (secondHand == 18) {secondHand = 0;}
 }
 
 void LedStrip::run()
@@ -127,10 +131,12 @@ void LedStrip::run()
     startIndex = startIndex + 1; /* motion speed */
     FillLEDsFromPaletteColors(startIndex);
     brightness = map(analogRead(KRUTILKA), 0, 1023, 0, 255);
-    if (brightness != prev_brightness)
+    if (abs(brightness - prev_brightness) > 20)
     {
-        somebody_inside_toilet = true;
+        toilet.set_sleep(false);
+        toilet.update_enter_led();
         prev_brightness = brightness;
+        toilet.somebody_inside_toilet = true;
     }
     FastLED.setBrightness(brightness);
     FastLED.show();

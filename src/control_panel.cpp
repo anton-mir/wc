@@ -6,7 +6,7 @@
 #include <RBD_Button.h>
 
 extern LedStrip led_strip;
-extern bool somebody_inside_toilet;
+extern Toilet toilet;
 
 RBD::Button switch_on(SWITCH_ON);
 RBD::Button switch_off(SWITCH_OFF);
@@ -45,21 +45,23 @@ void ControlPanel::check_switch()
 {
   if (switch_on.onPressed()) 
   {
+    Serial.println(F("Switch on pressed"));
+    toilet.set_sleep(false);
+    toilet.update_enter_led();
     set_panel_led(RED);
     digitalWrite(MAGNET, HIGH);
     toneAC(NOTE_C5, BUTTON_SOUND_VOLUME, BUTTON_SOUND_TIME, true);
-    // blue_led_blink_timer.stop();
-    somebody_inside_toilet = true;
-    // sleep_mode = false;
+    toilet.somebody_inside_toilet = true;
   }
   if (switch_off.onPressed()) 
   {
+    Serial.println(F("Switch off pressed"));
+    toilet.set_sleep(false);
+    toilet.update_enter_led();
     set_panel_led(GREEN);
     digitalWrite(MAGNET, LOW);
     toneAC(NOTE_A4, BUTTON_SOUND_VOLUME, BUTTON_SOUND_TIME, true);
-    // blue_led_blink_timer.stop();
-    somebody_inside_toilet = true;
-    // sleep_mode = false;
+    toilet.somebody_inside_toilet = true;
   }
 }
 
@@ -67,10 +69,11 @@ void ControlPanel::check_red_btn()
 {
   if (red_big_btn.onPressed()) 
   {
-    // blue_led_blink_timer.stop();  
-    somebody_inside_toilet = true;
-    // sleep_mode = false;
+    Serial.println(F("Red button pressed"));
+    toilet.set_sleep(false);
+    toilet.update_enter_led();
     toneAC(NOTE_E5, BUTTON_SOUND_VOLUME, BUTTON_SOUND_TIME, true);
     led_strip.ChangePaletteOneByOne();
+    toilet.somebody_inside_toilet = true;
   }
 }

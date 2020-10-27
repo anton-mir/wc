@@ -9,6 +9,28 @@
 #define UPDATES_PER_SECOND 100
 #define KRUTILKA A0
 
+const TProgmemRGBPalette16 Black_p FL_PROGMEM =
+{
+    CRGB::Black,
+    CRGB::Black,
+    CRGB::Black,
+    CRGB::Black,
+
+    CRGB::Black,
+    CRGB::Black,
+    CRGB::Black,
+
+    CRGB::Black,
+    CRGB::Black,
+    CRGB::Black,
+    CRGB::Black,
+
+    CRGB::Black,
+    CRGB::Black,
+    CRGB::Black,
+    CRGB::Black
+};
+
 extern CRGBPalette16 myRedWhiteBluePalette;
 extern const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM;
 

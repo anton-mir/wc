@@ -9,7 +9,10 @@ Toilet toilet;
 LedStrip led_strip;
 
 void setup() 
-{}
+{
+  Serial.begin(115200);
+  Serial.println(F("Welcome to toilet!"));
+}
 
 void loop() 
 {

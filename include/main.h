@@ -10,5 +10,6 @@ typedef enum led_light
 {
     RED = 0,
     GREEN,
-    BLUE
+    BLUE,
+    OFF
 } led_color;
