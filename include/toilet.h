@@ -8,7 +8,7 @@
 #define LED_BLUE    8
 #define ENTER_BUTTON A1
 #define BLINK_DELAY 2000
-#define SLEEP_DELAY 5000 
+#define SLEEP_DELAY 300000 
 
 class Toilet
 {

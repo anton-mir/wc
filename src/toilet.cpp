@@ -1,16 +1,13 @@
 #include "toilet.h"
 #include "pitches.h"
 #include "toneAC.h"
+#include "ledstrip.h"
 
 RBD::Timer sleep_timer;
 RBD::Timer blue_led_blink_timer;
-
 RBD::Button enter_btn(ENTER_BUTTON);
 
-bool button_pressed_now, toilet_free, button_state_previous = 0;
-unsigned long button_pressing_time = 0;
-
-bool led_strip_on = true;
+extern LedStrip led_strip;
 
 Toilet::Toilet()
 {
@@ -81,17 +78,20 @@ void Toilet::check_enter_pin()
     }
 }
 
-void Toilet::set_sleep(bool sleep_state)
+void Toilet::set_sleep(bool state)
 {
-  if (sleep_state)
+  if (state)
   {
      sleep_mode = true;
      blue_led_blink_timer.restart();
+     led_strip.currentPalette = Black_p;
   }
-  else
+  else if (sleep_mode)
   {
+     Serial.println(F("Exit from the sleep mode"));
      sleep_mode = false;
      blue_led_blink_timer.stop();
+     led_strip.ChangePaletteOneByOne();
   } 
 }
 

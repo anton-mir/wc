@@ -46,10 +46,10 @@ class LedStrip
     void ChangePaletteRandom();
     void ChangePaletteOneByOne();
     void run();
+    CRGBPalette16 currentPalette;
 
     private:
     CRGB strip_leds[NUM_LEDS];
-    CRGBPalette16 currentPalette;
     TBlendType    currentBlending;
     int brightness, prev_brightness = BRIGHTNESS;
 };

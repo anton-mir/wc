@@ -15,6 +15,7 @@ class ControlPanel
     void check_switch();
     void check_red_btn();
     void set_panel_led(led_color light);
+    void update_panel_led();
 
     private:
 };

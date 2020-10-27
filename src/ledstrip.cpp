@@ -96,6 +96,8 @@ uint8_t random_palette = random(11);
         if( random_palette == 9)  { currentPalette = PartyColors_p;           currentBlending = LINEARBLEND; }
         if( random_palette == 10)  { currentPalette = myRedWhiteBluePalette_p; currentBlending = NOBLEND;  }
         if( random_palette == 11)  { currentPalette = myRedWhiteBluePalette_p; currentBlending = LINEARBLEND; }
+        Serial.print(F("Random palette number "));
+        Serial.println(random_palette);
 }
 
 void LedStrip::ChangePaletteOneByOne()

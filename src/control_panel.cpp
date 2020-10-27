@@ -41,6 +41,11 @@ void ControlPanel::set_panel_led(led_color light)
   }
 }
 
+void ControlPanel::update_panel_led()
+{
+  switch_on.isPressed() ? set_panel_led(RED) : set_panel_led(GREEN);
+}
+
 void ControlPanel::check_switch()
 {
   if (switch_on.onPressed()) 
@@ -48,7 +53,7 @@ void ControlPanel::check_switch()
     Serial.println(F("Switch on pressed"));
     toilet.set_sleep(false);
     toilet.update_enter_led();
-    set_panel_led(RED);
+    update_panel_led();
     digitalWrite(MAGNET, HIGH);
     toneAC(NOTE_C5, BUTTON_SOUND_VOLUME, BUTTON_SOUND_TIME, true);
     toilet.somebody_inside_toilet = true;
@@ -58,7 +63,7 @@ void ControlPanel::check_switch()
     Serial.println(F("Switch off pressed"));
     toilet.set_sleep(false);
     toilet.update_enter_led();
-    set_panel_led(GREEN);
+    update_panel_led();
     digitalWrite(MAGNET, LOW);
     toneAC(NOTE_A4, BUTTON_SOUND_VOLUME, BUTTON_SOUND_TIME, true);
     toilet.somebody_inside_toilet = true;
