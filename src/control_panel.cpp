@@ -8,8 +8,8 @@
 extern LedStrip led_strip;
 extern Toilet toilet;
 
-RBD::Button switch_on(SWITCH_ON);
-RBD::Button switch_off(SWITCH_OFF);
+RBD::Button switch_close(SWITCH_ON);
+RBD::Button switch_open(SWITCH_OFF);
 RBD::Button red_big_btn(RED_BIG_BUTTON);
 
 ControlPanel::ControlPanel()
@@ -43,30 +43,41 @@ void ControlPanel::set_panel_led(led_color light)
 
 void ControlPanel::update_panel_led()
 {
-  switch_on.isPressed() ? set_panel_led(RED) : set_panel_led(GREEN);
+  switch_close.isPressed() ? set_panel_led(GREEN) : set_panel_led(RED);
 }
 
 void ControlPanel::check_switch()
 {
-  if (switch_on.onPressed()) 
+  static bool click_helper = false;
+  if (switch_close.onPressed()) 
   {
     Serial.println(F("Switch on pressed"));
     toilet.set_sleep(false);
-    toilet.update_enter_led();
-    update_panel_led();
-    digitalWrite(MAGNET, HIGH);
     toneAC(NOTE_C5, BUTTON_SOUND_VOLUME, BUTTON_SOUND_TIME, true);
     toilet.somebody_inside_toilet = true;
+    if (toilet.get_enter_btn_state() && !click_helper)
+    {
+      toilet.update_enter_led();
+      update_panel_led();
+      digitalWrite(MAGNET, LOW);
+      toilet.door_is_blocked = true;
+      Serial.println(F("Door is blocked"));
+    }
   }
-  if (switch_off.onPressed()) 
+  if (switch_open.onPressed()) 
   {
     Serial.println(F("Switch off pressed"));
     toilet.set_sleep(false);
-    toilet.update_enter_led();
-    update_panel_led();
-    digitalWrite(MAGNET, LOW);
     toneAC(NOTE_A4, BUTTON_SOUND_VOLUME, BUTTON_SOUND_TIME, true);
     toilet.somebody_inside_toilet = true;
+    if (!toilet.door_is_blocked)
+    {
+      toilet.update_enter_led();
+      update_panel_led();
+      digitalWrite(MAGNET, HIGH);
+      click_helper = false;
+    }
+    else click_helper = true;
   }
 }
 

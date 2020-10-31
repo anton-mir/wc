@@ -5,6 +5,7 @@
 
 RBD::Timer sleep_timer;
 RBD::Timer blue_led_blink_timer;
+RBD::Button sliv(SLIV);
 RBD::Button enter_btn(ENTER_BUTTON);
 
 extern LedStrip led_strip;
@@ -14,11 +15,13 @@ Toilet::Toilet()
     pinMode(LED_GREEN,OUTPUT);
     pinMode(LED_RED,OUTPUT);
     pinMode(LED_BLUE,OUTPUT);
+    // pinMode(SLIV,INPUT_PULLUP);
     set_enter_led(GREEN);
     sleep_timer.setTimeout(SLEEP_DELAY);
     sleep_timer.restart();
     blue_led_blink_timer.setTimeout(BLINK_DELAY);
     blue_led_blink_timer.stop();
+    sliv.setDebounceTimeout(50);
 }
 
 void Toilet::set_enter_led(led_color light)
@@ -49,9 +52,29 @@ void Toilet::set_enter_led(led_color light)
   }
 }
 
+bool Toilet::get_enter_btn_state()
+{
+  bool state = false;
+  if (enter_btn.isPressed()) state = true;
+  return state;
+}
+
 void Toilet::update_enter_led()
 {
   enter_btn.isPressed() ? set_enter_led(RED) : set_enter_led(GREEN);
+}
+
+void Toilet::check_sliv()
+{
+  if (sliv.onPressed())
+  {
+    Serial.println(F("Sliv pressed"));
+    if (door_is_blocked) 
+    {
+      Serial.println(F("Door is unblocked"));
+      door_is_blocked = false;
+    }
+  }
 }
 
 void Toilet::check_enter_pin()

@@ -19,6 +19,7 @@ void loop()
   led_strip.run();
   control_panel.check_red_btn();
   control_panel.check_switch();
+  toilet.check_sliv();
   toilet.check_enter_pin();
   toilet.check_sleep();
 }   
