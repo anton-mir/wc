@@ -25,6 +25,7 @@ class Toilet
     void set_sleep(bool sleep_state);
     bool somebody_inside_toilet = false;
     bool door_is_blocked = false;
+    void run();
 
     private:
     bool sleep_mode = true; 

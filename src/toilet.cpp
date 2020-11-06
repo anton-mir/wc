@@ -5,6 +5,8 @@
 
 RBD::Timer sleep_timer;
 RBD::Timer blue_led_blink_timer;
+RBD::Timer panel_blink_timer;
+
 RBD::Button sliv(SLIV);
 RBD::Button enter_btn(ENTER_BUTTON);
 
@@ -69,6 +71,7 @@ void Toilet::check_sliv()
   if (sliv.onPressed())
   {
     Serial.println(F("Sliv pressed"));
+    panel_blink_timer.restart();
     if (door_is_blocked) 
     {
       Serial.println(F("Door is unblocked"));
@@ -130,4 +133,12 @@ void Toilet::check_sleep()
     blue_led_state = !blue_led_state;
     blue_led_blink_timer.restart(); 
   }
+}
+
+void Toilet::run()
+{
+  check_sliv();
+  check_enter_pin();
+  check_sleep();
+  update_enter_led();
 }
