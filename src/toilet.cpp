@@ -1,4 +1,5 @@
 #include "toilet.h"
+#include "control_panel.h"
 #include "pitches.h"
 #include "toneAC.h"
 #include "ledstrip.h"
@@ -11,13 +12,13 @@ RBD::Button sliv(SLIV);
 RBD::Button enter_btn(ENTER_BUTTON);
 
 extern LedStrip led_strip;
+extern ControlPanel control_panel;
 
 Toilet::Toilet()
 {
     pinMode(LED_GREEN,OUTPUT);
     pinMode(LED_RED,OUTPUT);
     pinMode(LED_BLUE,OUTPUT);
-    // pinMode(SLIV,INPUT_PULLUP);
     set_enter_led(GREEN);
     sleep_timer.setTimeout(SLEEP_DELAY);
     sleep_timer.restart();
@@ -63,7 +64,14 @@ bool Toilet::get_enter_btn_state()
 
 void Toilet::update_enter_led()
 {
-  enter_btn.isPressed() ? set_enter_led(RED) : set_enter_led(GREEN);
+  if (enter_btn.isPressed() && somebody_inside_toilet)
+  {
+    set_enter_led(RED);
+  }
+  else if (!sleep_mode)
+  {
+    set_enter_led(GREEN);
+  }
 }
 
 void Toilet::check_sliv()
@@ -71,12 +79,9 @@ void Toilet::check_sliv()
   if (sliv.onPressed())
   {
     Serial.println(F("Sliv pressed"));
+    toneAC(NOTE_GS4, BUTTON_SOUND_VOLUME, BUTTON_SOUND_TIME, true);
+    control_panel.set_panel_led(OFF);
     panel_blink_timer.restart();
-    if (door_is_blocked) 
-    {
-      Serial.println(F("Door is unblocked"));
-      door_is_blocked = false;
-    }
   }
 }
 
@@ -97,10 +102,8 @@ void Toilet::check_enter_pin()
       update_enter_led(); 
       toneAC(NOTE_GS4, BUTTON_SOUND_VOLUME, BUTTON_SOUND_TIME, true);
       blue_led_blink_timer.stop();
-      if (somebody_inside_toilet) {
-        somebody_inside_toilet = false;
-        sleep_timer.restart();
-      }
+      somebody_inside_toilet = false;
+      sleep_timer.restart();
     }
 }
 

@@ -21,5 +21,5 @@ class ControlPanel
     void check_switch();
     void check_red_btn();
     bool panel_leds_state = false;
-    uint8_t panel_blink_timer_counter = 0;
+    uint8_t panel_blink_timer_counter = PANEL_BLINK_TIMES;
 };

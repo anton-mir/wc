@@ -9,8 +9,8 @@ extern LedStrip led_strip;
 extern Toilet toilet;
 extern RBD::Timer panel_blink_timer;
 
-RBD::Button switch_close(SWITCH_ON);
-RBD::Button switch_open(SWITCH_OFF);
+RBD::Button switch_close(SWITCH_OFF);
+RBD::Button switch_open(SWITCH_ON);
 RBD::Button red_big_btn(RED_BIG_BUTTON);
 
 ControlPanel::ControlPanel()
@@ -20,8 +20,8 @@ ControlPanel::ControlPanel()
     pinMode(LED_BOARD_GREEN,OUTPUT);
     pinMode(LED_BOARD_RED,OUTPUT);
     set_panel_led(GREEN);
-    digitalWrite(MAGNET, LOW);
-    panel_blink_timer.setTimeout(500);
+    digitalWrite(MAGNET, HIGH);
+    panel_blink_timer.setTimeout(200);
     panel_blink_timer.stop();
 }
 
@@ -30,13 +30,13 @@ void ControlPanel::set_panel_led(led_color light)
   switch (light)
   {
     case RED:
-      digitalWrite(LED_BOARD_RED,LOW);
-      digitalWrite(LED_BOARD_GREEN,HIGH);
+      digitalWrite(LED_BOARD_RED,HIGH);
+      digitalWrite(LED_BOARD_GREEN,LOW);
       panel_leds_state = true;
     break;
     case GREEN:
-      digitalWrite(LED_BOARD_RED,HIGH);
-      digitalWrite(LED_BOARD_GREEN,LOW);
+      digitalWrite(LED_BOARD_RED,LOW);
+      digitalWrite(LED_BOARD_GREEN,HIGH);
       panel_leds_state = true;
     break;
     case OFF:
@@ -59,23 +59,13 @@ void ControlPanel::set_panel_led(led_color light)
 
 void ControlPanel::update_panel_led()
 {
-  if (panel_blink_timer.isActive())
+  if (switch_close.isPressed())
   {
-    if (panel_blink_timer_counter < PANEL_BLINK_TIMES)
-    {
-      panel_leds_state ? set_panel_led(ON) : set_panel_led(OFF);
-      panel_blink_timer_counter++;
-      panel_blink_timer.restart();
-    }
-    else 
-    {
-      panel_blink_timer.stop();
-      panel_blink_timer_counter = 0;
-    }
+    set_panel_led(RED);
   }
-  else
+  else if (switch_open.isPressed())
   {
-    switch_close.isPressed() ? set_panel_led(GREEN) : set_panel_led(RED);
+    set_panel_led(GREEN);
   }
 }
 
@@ -84,7 +74,7 @@ void ControlPanel::check_switch()
   static bool click_helper = false;
   if (switch_close.onPressed()) 
   {
-    Serial.println(F("Switch on pressed"));
+    Serial.println(F("Switch close is pressed"));
     toilet.set_sleep(false);
     toneAC(NOTE_C5, BUTTON_SOUND_VOLUME, BUTTON_SOUND_TIME, true);
     toilet.somebody_inside_toilet = true;
@@ -92,12 +82,13 @@ void ControlPanel::check_switch()
     {
       digitalWrite(MAGNET, LOW);
       toilet.door_is_blocked = true;
+      update_panel_led();
       Serial.println(F("Door is blocked"));
     }
   }
   if (switch_open.onPressed()) 
   {
-    Serial.println(F("Switch off pressed"));
+    Serial.println(F("Switch open is pressed"));
     toilet.set_sleep(false);
     toneAC(NOTE_A4, BUTTON_SOUND_VOLUME, BUTTON_SOUND_TIME, true);
     toilet.somebody_inside_toilet = true;
@@ -105,6 +96,7 @@ void ControlPanel::check_switch()
     {
       digitalWrite(MAGNET, HIGH);
       click_helper = false;
+      update_panel_led();
     }
     else click_helper = true;
   }
@@ -126,5 +118,26 @@ void ControlPanel::run()
 {
   check_red_btn();
   check_switch();
-  update_panel_led();
+  
+  // Panel led blinking logic
+  if (panel_blink_timer.onExpired())
+  {
+    if (panel_blink_timer_counter--)
+    {
+
+        panel_leds_state ? set_panel_led(OFF) : set_panel_led(ON);
+        panel_blink_timer.restart();
+    }
+    else
+    {
+      panel_blink_timer.stop();
+      panel_blink_timer_counter = PANEL_BLINK_TIMES;
+      if (toilet.door_is_blocked) 
+        {
+          Serial.println(F("Door is unblocked"));
+          toilet.door_is_blocked = false;
+          set_panel_led(RED);   
+        }
+    }
+  }
 }
