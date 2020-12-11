@@ -8,6 +8,7 @@
 extern LedStrip led_strip;
 extern Toilet toilet;
 extern RBD::Timer panel_blink_timer;
+extern RBD::Timer sleep_timer;
 
 RBD::Button switch_close(SWITCH_OFF);
 RBD::Button switch_open(SWITCH_ON);
@@ -72,7 +73,7 @@ void ControlPanel::update_panel_led()
 void ControlPanel::check_switch()
 {
   static bool click_helper = false;
-  if (switch_close.onPressed()) 
+  if (switch_close.onPressed() && millis()>1000) 
   {
     Serial.println(F("Switch close is pressed"));
     toilet.set_sleep(false);
@@ -133,11 +134,11 @@ void ControlPanel::run()
       panel_blink_timer.stop();
       panel_blink_timer_counter = PANEL_BLINK_TIMES;
       if (toilet.door_is_blocked) 
-        {
-          Serial.println(F("Door is unblocked"));
-          toilet.door_is_blocked = false;
-          set_panel_led(RED);   
-        }
+      {
+        Serial.println(F("Door is unblocked"));
+        toilet.door_is_blocked = false;
+      }
+      update_panel_led();
     }
   }
 }

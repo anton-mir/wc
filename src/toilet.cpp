@@ -82,6 +82,7 @@ void Toilet::check_sliv()
     toneAC(NOTE_GS4, BUTTON_SOUND_VOLUME, BUTTON_SOUND_TIME, true);
     control_panel.set_panel_led(OFF);
     panel_blink_timer.restart();
+    set_sleep(false);
   }
 }
 
@@ -121,6 +122,10 @@ void Toilet::set_sleep(bool state)
      sleep_mode = false;
      blue_led_blink_timer.stop();
      led_strip.ChangePaletteOneByOne();
+    if (!get_enter_btn_state())
+    {
+      sleep_timer.restart();
+    }
   } 
 }
 
