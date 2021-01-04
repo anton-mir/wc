@@ -8,7 +8,7 @@
 extern LedStrip led_strip;
 extern Toilet toilet;
 extern RBD::Timer panel_blink_timer;
-extern RBD::Timer sleep_timer;
+extern RBD::Timer sleep_countdown_timer;
 
 RBD::Button switch_close(SWITCH_OFF);
 RBD::Button switch_open(SWITCH_ON);
@@ -78,8 +78,7 @@ void ControlPanel::check_switch()
     Serial.println(F("Switch close is pressed"));
     toilet.set_sleep(false);
     toneAC(NOTE_C5, BUTTON_SOUND_VOLUME, BUTTON_SOUND_TIME, true);
-    toilet.somebody_inside_toilet = true;
-    if (toilet.get_enter_btn_state() && !click_helper)
+    if (toilet.enter_door_closed() && !click_helper && toilet.somebody_inside_toilet)
     {
       digitalWrite(MAGNET, LOW);
       toilet.door_is_blocked = true;
@@ -92,7 +91,6 @@ void ControlPanel::check_switch()
     Serial.println(F("Switch open is pressed"));
     toilet.set_sleep(false);
     toneAC(NOTE_A4, BUTTON_SOUND_VOLUME, BUTTON_SOUND_TIME, true);
-    toilet.somebody_inside_toilet = true;
     if (!toilet.door_is_blocked)
     {
       digitalWrite(MAGNET, HIGH);
@@ -111,7 +109,6 @@ void ControlPanel::check_red_btn()
     toilet.set_sleep(false);
     toneAC(NOTE_E5, BUTTON_SOUND_VOLUME, BUTTON_SOUND_TIME, true);
     led_strip.ChangePaletteOneByOne();
-    toilet.somebody_inside_toilet = true;
   }
 }
 

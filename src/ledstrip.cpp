@@ -138,7 +138,6 @@ void LedStrip::run()
         toilet.set_sleep(false);
         toilet.update_enter_led();
         prev_brightness = brightness;
-        toilet.somebody_inside_toilet = true;
     }
     FastLED.setBrightness(brightness);
     FastLED.show();
